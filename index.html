@@ -104,14 +104,61 @@
             
             // Simulate form submission (replace with actual API call to n8n)
             console.log('Submitting:', { name, email, cv });
-            
-            message.textContent = 'Application submitted successfully! You will receive an email with further questions soon.';
-            message.classList.remove('hidden', 'text-red-600');
-            message.classList.add('text-green-600');
+
+
+            try {
+                const response = await fetch('https://n8n.sdirin.com/webhook-test/00fd7cb9-6520-45eb-8c5b-52cb9cc2f377', {
+                    method: 'POST',
+                    body: formData
+                });
+                const message = document.getElementById('message');
+                if (response.ok) {
+                    message.textContent = 'Answers submitted successfully!';
+                    message.classList.remove('hidden', 'text-red-600');
+                    message.classList.add('text-green-600');
+                    this.reset();
+                } else {
+                    message.textContent = 'Error submitting answers. Please try again.';
+                    message.classList.remove('hidden', 'text-green-600');
+                    message.classList.add('text-red-600');
+                }
+            } catch (error) {
+                message.textContent = 'Error: Unable to connect to the server.';
+                message.classList.remove('hidden', 'text-green-600');
+                message.classList.add('text-red-600');
+            }
+                
+            // message.textContent = 'Application submitted successfully! You will receive an email with further questions soon.';
+            // message.classList.remove('hidden', 'text-red-600');
+            // message.classList.add('text-green-600');
+
+                
             
             // Reset form
-            this.reset();
+            // this.reset();
         });
+
+         try {
+                const response = await fetch('YOUR_N8N_ANSWERS_WEBHOOK_URL', {
+                    method: 'POST',
+                    body: formData
+                });
+                const message = document.getElementById('message');
+                if (response.ok) {
+                    message.textContent = 'Answers submitted successfully!';
+                    message.classList.remove('hidden', 'text-red-600');
+                    message.classList.add('text-green-600');
+                    this.reset();
+                } else {
+                    message.textContent = 'Error submitting answers. Please try again.';
+                    message.classList.remove('hidden', 'text-green-600');
+                    message.classList.add('text-red-600');
+                }
+            } catch (error) {
+                message.textContent = 'Error: Unable to connect to the server.';
+                message.classList.remove('hidden', 'text-green-600');
+                message.classList.add('text-red-600');
+            }
     </script>
 </body>
 </html>
