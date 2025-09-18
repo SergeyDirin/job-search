@@ -137,28 +137,6 @@
             // Reset form
             // this.reset();
         });
-
-         try {
-                const response = await fetch('YOUR_N8N_ANSWERS_WEBHOOK_URL', {
-                    method: 'POST',
-                    body: formData
-                });
-                const message = document.getElementById('message');
-                if (response.ok) {
-                    message.textContent = 'Answers submitted successfully!';
-                    message.classList.remove('hidden', 'text-red-600');
-                    message.classList.add('text-green-600');
-                    this.reset();
-                } else {
-                    message.textContent = 'Error submitting answers. Please try again.';
-                    message.classList.remove('hidden', 'text-green-600');
-                    message.classList.add('text-red-600');
-                }
-            } catch (error) {
-                message.textContent = 'Error: Unable to connect to the server.';
-                message.classList.remove('hidden', 'text-green-600');
-                message.classList.add('text-red-600');
-            }
     </script>
 </body>
 </html>
