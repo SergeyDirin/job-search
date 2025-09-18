@@ -1,0 +1,117 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Work Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Apply for Remote Work Opportunities</h1>
+        <p class="text-center text-gray-600 mb-8">Submit your details to start your journey towards finding the perfect remote job!</p>
+        
+        <form id="applicationForm" class="space-y-6">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" id="name" name="name" required 
+                       class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                <input type="email" id="email" name="email" required 
+                       class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label for="cv" class="block text-sm font-medium text-gray-700">Upload CV (PDF)</label>
+                <input type="file" id="cv" name="cv" accept=".pdf" required 
+                       class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <p class="mt-1 text-sm text-gray-500">Please upload your CV in PDF format (max 5MB).</p>
+            </div>
+            
+            <button type="submit" 
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Submit Application
+            </button>
+        </form>
+        
+        <p id="message" class="mt-4 text-center text-sm text-gray-600 hidden"></p>
+    </div>
+
+    <script>
+        document.getElementById('applicationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const cv = document.getElementById('cv').files[0];
+            const message = document.getElementById('message');
+            
+            if (cv && cv.size > 5 * 1024 * 1024) {
+                message.textContent = 'Error: CV file size exceeds 5MB limit.';
+                message.classList.remove('hidden', 'text-green-600');
+                message.classList.add('text-red-600');
+                return;
+            }
+            
+            if (cv && cv.type !== 'application/pdf') {
+                message.textContent = 'Error: Please upload a valid PDF file.';
+                message.classList.remove('hidden', 'text-green-600');
+                message.classList.add('text-red-600');
+                return;
+            }
+            
+            // Simulate form submission (replace with actual API call to n8n)
+            console.log('Submitting:', { name, email, cv });
+            
+            message.textContent = 'Application submitted successfully! You will receive an email with further questions soon.';
+            message.classList.remove('hidden', 'text-red-600');
+            message.classList.add('text-green-600');
+            
+            // Reset form
+            this.reset();
+        });
+    </script>
+</body>
+</html>
