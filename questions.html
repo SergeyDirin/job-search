@@ -39,35 +39,52 @@
                 throw new Error('Failed to load questions');
             }
             const data = await response.json();
-            
-            // Assuming data.questions is an array of strings
-            const questions = data.questions || [];
-            
+
+            // Set introduction
+            const introDiv = document.getElementById('introduction');
+            const introP = document.createElement('p');
+            introP.textContent = data.Introduction || 'Welcome to the questionnaire.';
+            introDiv.appendChild(introP);
+
+            // Set questions (Q1 to Q15)
             const questionsDiv = document.getElementById('questions');
-            questions.forEach((q, index) => {
-                const div = document.createElement('div');
-                div.className = 'question';
-                
-                const label = document.createElement('label');
-                label.textContent = q;
-                label.setAttribute('for', `answer-${index}`);
-                
-                const textarea = document.createElement('textarea');
-                textarea.id = `answer-${index}`;
-                
-                div.appendChild(label);
-                div.appendChild(textarea);
-                questionsDiv.appendChild(div);
-            });
-            
+            for (let i = 1; i <= 15; i++) {
+                const questionKey = `Q${i}`;
+                const questionText = data[questionKey];
+                if (questionText) {
+                    const div = document.createElement('div');
+                    div.className = 'question';
+
+                    const label = document.createElement('label');
+                    label.textContent = questionText;
+                    label.setAttribute('for', `answer-${i}`);
+
+                    const textarea = document.createElement('textarea');
+                    textarea.id = `answer-${i}`;
+
+                    div.appendChild(label);
+                    div.appendChild(textarea);
+                    questionsDiv.appendChild(div);
+                }
+            }
+
+            // Set conclusion
+            const conclusionDiv = document.getElementById('conclusion');
+            const conclusionP = document.createElement('p');
+            conclusionP.textContent = data.Conclusion || 'Thank you for completing the questionnaire.';
+            conclusionDiv.appendChild(conclusionP);
+
+            // Show form and hide loading
             document.getElementById('loading').style.display = 'none';
             document.getElementById('form-container').style.display = 'block';
-            
+
+            // Submit button handler
             document.getElementById('submit-btn').addEventListener('click', async () => {
-                const answers = questions.map((q, index) => {
-                    return document.getElementById(`answer-${index}`).value;
-                });
-                
+                const answers = [];
+                for (let i = 1; i <= 15; i++) {
+                    answers.push(document.getElementById(`answer-${i}`)?.value || '');
+                }
+
                 try {
                     const submitResponse = await fetch('https://n8n.sdirin.com/webhook-test/00fd7cb9-6520-45eb-8c5b-52cb9cc2f377', {
                         method: 'POST',
@@ -76,7 +93,7 @@
                         },
                         body: JSON.stringify({ answers })
                     });
-                    
+
                     if (!submitResponse.ok) {
                         throw new Error('Failed to send answers');
                     }
@@ -95,3 +112,4 @@
 
 </body>
 </html>
+
