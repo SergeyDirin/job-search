@@ -71,7 +71,7 @@
             formData.append('cv', cv);
             
             try {
-                const response = await fetch('https://n8n.sdirin.com/webhook-test/588c94d9-6420-49ee-aca4-089cb244bcb4', {
+                const response = await fetch('https://n8n.sdirin.com/webhook/first-request', {
                     method: 'POST',
                     body: formData
                 });
