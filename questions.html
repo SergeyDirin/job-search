@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #loading { text-align: center; margin-top: 50px; }
+        #form-container { display: none; }
+        .question { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        textarea { width: 100%; height: 100px; padding: 10px; box-sizing: border-box; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div id="loading">We are loading your questions</div>
+
+<div id="form-container">
+    <form id="answer-form">
+        <div id="questions"></div>
+        <button type="button" id="submit-btn">Send the answers</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('https://n8n.sdirin.com/webhook-test/0a178446-f312-4e40-a538-f8144e6a7c93');
+            if (!response.ok) {
+                throw new Error('Failed to load questions');
+            }
+            const data = await response.json();
+            
+            // Assuming data.questions is an array of strings
+            const questions = data.questions || [];
+            
+            const questionsDiv = document.getElementById('questions');
+            questions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+                
+                const label = document.createElement('label');
+                label.textContent = q;
+                label.setAttribute('for', `answer-${index}`);
+                
+                const textarea = document.createElement('textarea');
+                textarea.id = `answer-${index}`;
+                
+                div.appendChild(label);
+                div.appendChild(textarea);
+                questionsDiv.appendChild(div);
+            });
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('form-container').style.display = 'block';
+            
+            document.getElementById('submit-btn').addEventListener('click', async () => {
+                const answers = questions.map((q, index) => {
+                    return document.getElementById(`answer-${index}`).value;
+                });
+                
+                try {
+                    const submitResponse = await fetch('https://n8n.sdirin.com/webhook-test/00fd7cb9-6520-45eb-8c5b-52cb9cc2f377', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ answers })
+                    });
+                    
+                    if (!submitResponse.ok) {
+                        throw new Error('Failed to send answers');
+                    }
+                    alert('Answers sent successfully!');
+                } catch (error) {
+                    console.error(error);
+                    alert('Error sending answers');
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            document.getElementById('loading').textContent = 'Error loading questions';
+        }
+    });
+</script>
+
+</body>
+</html>
