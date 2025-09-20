@@ -5,16 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Question Form</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #loading { text-align: center; margin-top: 50px; }
-        #form-container { display: none; }
-        .question { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        textarea { width: 100%; height: 100px; padding: 10px; box-sizing: border-box; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        #introduction, #conclusion { margin-bottom: 30px; }
-        p { line-height: 1.6; }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        #loading { 
+            text-align: center; 
+            margin-top: 50px; 
+        }
+        #form-container { 
+            display: none; 
+            width: 100%; 
+            max-width: 800px; /* Limit width for desktops/laptops */
+            margin: 0 auto; /* Center the form */
+        }
+        .question { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+        }
+        textarea { 
+            width: 100%; 
+            height: 100px; 
+            padding: 10px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            padding: 10px 20px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            width: 100%; /* Full width button on mobile */
+            max-width: 200px; /* Limit button width on desktop */
+            margin: 0 auto; /* Center button */
+            display: block; 
+        }
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        #introduction, #conclusion { 
+            margin-bottom: 30px; 
+        }
+        p { 
+            line-height: 1.6; 
+        }
+        @media (max-width: 600px) {
+            #form-container { 
+                max-width: 100%; /* Full width on mobile */
+            }
+            button { 
+                max-width: 100%; /* Full width button on mobile */
+            }
+        }
     </style>
 </head>
 <body>
@@ -29,8 +79,6 @@
         <button type="button" id="submit-btn">Send the answers</button>
     </form>
 </div>
-
-
 
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -115,8 +163,9 @@
         }
     });
 </script>
-
+    
 </body>
 </html>
+
 
 
