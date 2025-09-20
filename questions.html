@@ -88,7 +88,7 @@
 
         try {
             // Append the 'u' parameter to the request URL
-            const response = await fetch(`https://n8n.sdirin.com/webhook-test/0a178446-f312-4e40-a538-f8144e6a7c93?u=${encodeURIComponent(uParam)}`);
+            const response = await fetch(`https://n8n.sdirin.com/webhook-test/load-questions?u=${encodeURIComponent(uParam)}`);
             if (!response.ok) {
                 throw new Error('Failed to load questions');
             }
@@ -140,7 +140,7 @@
                 }
 
                 try {
-                    const submitResponse = await fetch('https://n8n.sdirin.com/webhook-test/00fd7cb9-6520-45eb-8c5b-52cb9cc2f377', {
+                    const submitResponse = await fetch('https://n8n.sdirin.com/webhook/saving-answers', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -166,6 +166,7 @@
     
 </body>
 </html>
+
 
 
 
