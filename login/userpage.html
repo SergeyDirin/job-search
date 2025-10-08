@@ -24,6 +24,24 @@
         }
         .user-info {
             margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcdd2;
+        }
+        .debug-info {
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
         }
         .logout-btn {
             background-color: #f44336;
@@ -42,32 +60,88 @@
 <body>
     <div class="container">
         <h1>Welcome to Your Dashboard</h1>
+        <div id="errorContainer"></div>
         <div id="userInfo" class="user-info"></div>
+        <div id="debugInfo" class="debug-info"></div>
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <script>
-        // Retrieve user data from localStorage
-        const userData = localStorage.getItem('userData');
-        
-        if (userData) {
-            const parsedData = JSON.parse(userData);
-            // Display user information (adjust based on your actual response structure)
-            document.getElementById('userInfo').innerHTML = `
-                <p><strong>Username:</strong> ${parsedData.username || 'N/A'}</p>
-                <p><strong>Status:</strong> ${parsedData.status || 'N/A'}</p>
-                <!-- Add other fields from your response as needed -->
-            `;
-        } else {
-            // Redirect back to login if no user data found
-            window.location.href = 'login.html';
+        function showDebugInfo(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.textContent = message;
+            debugDiv.style.display = 'block';
         }
-        
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorContainer');
+            errorDiv.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        // Check localStorage availability
+        function isLocalStorageAvailable() {
+            try {
+                const test = '__localStorage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        // Load user data
+        function loadUserData() {
+            if (!isLocalStorageAvailable()) {
+                showError('Browser storage is not available. Redirecting to login...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+                return;
+            }
+
+            try {
+                const userDataString = localStorage.getItem('userData');
+                showDebugInfo(`Raw localStorage data: ${userDataString}`);
+                
+                if (!userDataString) {
+                    showError('No user data found. Redirecting to login page...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                    return;
+                }
+
+                const userData = JSON.parse(userDataString);
+                showDebugInfo(`Parsed user data: ${JSON.stringify(userData)}`);
+                
+                // Display user information
+                const userInfoDiv = document.getElementById('userInfo');
+                let userInfoHTML = '<h3>User Information:</h3>';
+                
+                for (const [key, value] of Object.entries(userData)) {
+                    userInfoHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+                }
+                
+                userInfoDiv.innerHTML = userInfoHTML;
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showError('Error loading user data. Redirecting to login...');
+                setTimeout(() => {
+                    localStorage.removeItem('userData');
+                    window.location.href = 'login.html';
+                }, 3000);
+            }
+        }
+
         function logout() {
-            // Clear user data and redirect to login
             localStorage.removeItem('userData');
             window.location.href = 'login.html';
         }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadUserData);
     </script>
 </body>
 </html>
