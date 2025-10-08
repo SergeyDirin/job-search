@@ -4,144 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .user-info {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .error-message {
-            color: #d32f2f;
-            background-color: #ffebee;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            border: 1px solid #ffcdd2;
-        }
-        .debug-info {
-            background-color: #e3f2fd;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 10px;
-            font-size: 12px;
-        }
-        .logout-btn {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Your Dashboard</h1>
-        <div id="errorContainer"></div>
-        <div id="userInfo" class="user-info"></div>
-        <div id="debugInfo" class="debug-info"></div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+    <h1>User Dashboard Debug</h1>
+    <div id="debug"></div>
 
     <script>
-        function showDebugInfo(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.textContent = message;
-            debugDiv.style.display = 'block';
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorContainer');
-            errorDiv.innerHTML = `<div class="error-message">${message}</div>`;
-        }
-
-        // Check localStorage availability
-        function isLocalStorageAvailable() {
+        // Get the raw data from localStorage
+        const rawData = localStorage.getItem('userData');
+        const debugDiv = document.getElementById('debug');
+        
+        debugDiv.innerHTML = `
+            <h3>Debug Information:</h3>
+            <p><strong>Raw localStorage data:</strong> ${rawData || 'null'}</p>
+        `;
+        
+        if (rawData) {
             try {
-                const test = '__localStorage_test__';
-                localStorage.setItem(test, test);
-                localStorage.removeItem(test);
-                return true;
-            } catch(e) {
-                return false;
+                const parsedData = JSON.parse(rawData);
+                debugDiv.innerHTML += `
+                    <p><strong>Parsed data type:</strong> ${typeof parsedData}</p>
+                    <p><strong>Parsed data keys:</strong> ${Object.keys(parsedData).join(', ')}</p>
+                    <p><strong>Full parsed data:</strong> ${JSON.stringify(parsedData, null, 2)}</p>
+                `;
+                
+                // Show what you're trying to access
+                debugDiv.innerHTML += `
+                    <p><strong>parsedData.username:</strong> ${parsedData.username || 'undefined'}</p>
+                    <p><strong>parsedData.status:</strong> ${parsedData.status || 'undefined'}</p>
+                `;
+                
+            } catch (e) {
+                debugDiv.innerHTML += `<p><strong>JSON Parse Error:</strong> ${e.message}</p>`;
             }
         }
-
-        // Load user data
-        function loadUserData() {
-            if (!isLocalStorageAvailable()) {
-                showError('Browser storage is not available. Redirecting to login...');
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 3000);
-                return;
-            }
-
-            try {
-                const userDataString = localStorage.getItem('userData');
-                showDebugInfo(`Raw localStorage data: ${userDataString}`);
-                
-                if (!userDataString) {
-                    showError('No user data found. Redirecting to login page...');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 3000);
-                    return;
-                }
-
-                const userData = JSON.parse(userDataString);
-                showDebugInfo(`Parsed user data: ${JSON.stringify(userData)}`);
-                
-                // Display user information
-                const userInfoDiv = document.getElementById('userInfo');
-                let userInfoHTML = '<h3>User Information:</h3>';
-                
-                for (const [key, value] of Object.entries(userData)) {
-                    userInfoHTML += `<p><strong>${key}:</strong> ${value}</p>`;
-                }
-                
-                userInfoDiv.innerHTML = userInfoHTML;
-                
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                showError('Error loading user data. Redirecting to login...');
-                setTimeout(() => {
-                    localStorage.removeItem('userData');
-                    window.location.href = 'login.html';
-                }, 3000);
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('userData');
-            window.location.href = 'login.html';
-        }
-
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadUserData);
     </script>
 </body>
 </html>
